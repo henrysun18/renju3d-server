@@ -39,7 +39,7 @@ func main() {
 	v := url.Values{}
 	v.Set("message", message)
 
-	response, err := http.Get("http://" + address + "/stickynote?" + v.Encode())
+	response, err := http.Get("http://" + address + "/ismyturn?" + v.Encode())
 	if err != nil {
 		log.Printf("%s", err)
 		os.Exit(1)

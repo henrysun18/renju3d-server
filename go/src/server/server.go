@@ -16,23 +16,22 @@ package main
 
 import (
 	"net/http"
+	"strconv"
 )
+
+var counter int = 0
 
 // [START handler]
 func handler(w http.ResponseWriter, r *http.Request) {
-	var sticky Sticky
-	sticky.Message = r.FormValue("message")
-	sticky.Centered = false
-	stickyBytes, err := sticky.DrawPNG(512, 512)
-	if err == nil {
-		w.Write(*stickyBytes)
-	}
+	counter++
+	str := r.FormValue("message")
+	w.Write([]byte(str+strconv.Itoa(counter)))
 }
 // [END handler]
 
 // [START main]
 func main() {
-	http.HandleFunc("/stickynote", handler)
+	http.HandleFunc("/ismyturn", handler)
 	http.ListenAndServe(":8080", nil)
 	//http.ListenAndServeTLS(":443", "ssl.crt", "ssl.key", nil)
 }
