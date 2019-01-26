@@ -14,12 +14,23 @@
 
 package main
 
-type Sticky struct {
-	Message  string
-	Centered bool
+import (
+	"net/http"
+)
+
+//state of the online rooms
+const numRooms = 10
+var rooms [numRooms]Room
+
+
+// [START main]
+func main() {
+	http.HandleFunc("/refreshlobby", refreshLobbyHandler)
+	http.HandleFunc("/join", joinHandler)
+	//http.HandleFunc("/spectate", spectateHandler)
+	//http.HandleFunc("/refresh", isMyTurnHandler)
+
+	http.ListenAndServe(":8080", nil)
+	//http.ListenAndServeTLS(":443", "ssl.crt", "ssl.key", nil)
 }
-
-
-const DEBUG_DRAWING = false
-
-
+// [END main]
