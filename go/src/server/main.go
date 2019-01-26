@@ -25,10 +25,13 @@ var rooms [numRooms]Room
 
 // [START main]
 func main() {
-	http.HandleFunc("/refreshlobby", refreshLobbyHandler)
+	//taking the approach of separating all words with hyphen, everything lower case
+	http.HandleFunc("/refresh-lobby", refreshLobbyHandler)
 	http.HandleFunc("/join", joinHandler)
-	http.HandleFunc("/ismyturn", isMyTurnHandler)
-	//http.HandleFunc("/mostRecentMove", mostRecentMoveHandler)
+	http.HandleFunc("/is-my-turn", isMyTurnHandler)
+	http.HandleFunc("/most-recent-move", mostRecentMoveHandler)
+	http.HandleFunc("/make-move", makeMoveHandler)
+	http.HandleFunc("/undo", undoHandler)
 	//http.HandleFunc("/spectate", spectateHandler)
 
 	http.ListenAndServe(":8080", nil)

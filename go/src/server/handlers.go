@@ -56,16 +56,44 @@ func joinHandler(w http.ResponseWriter, r *http.Request) {
 // return true or false given room# and player#
 func isMyTurnHandler(w http.ResponseWriter, r *http.Request) {
 	roomNumber, _ := strconv.Atoi(r.FormValue("room"))
-	playerNumber, _ := strconv.Atoi(r.FormValue("playernumber"))
+	playerNumber, _ := strconv.Atoi(r.FormValue("player-number"))
 	room := rooms[roomNumber]
 
 	isMyTurn := false
-	if room.IsBlacksTurn && playerNumber == 1 {
+	if room.IsWhitesTurn && playerNumber == 2 {
 		isMyTurn = true
-	} else if !room.IsBlacksTurn && playerNumber == 2 {
+	} else if !room.IsWhitesTurn && playerNumber == 1 {
 		isMyTurn = true
 	}
 	writeJsonResponse(w, isMyTurn)
 }
 
+// usually called ONCE immediately after isMyTurnHandler returns true to the client
+func mostRecentMoveHandler(w http.ResponseWriter, r *http.Request) {
+	roomNumber, _ := strconv.Atoi(r.FormValue("room"))
+	room := rooms[roomNumber]
+
+	writeJsonResponse(w, room.MovesHistory.Peek())
+}
+
+// usually called ONCE some time after both isMyTurn and mostRecentMove is handled
+// assumes that it's the player hitting this endpoint's turn
+func makeMoveHandler(w http.ResponseWriter, r *http.Request) {
+	roomNumber, _ := strconv.Atoi(r.FormValue("room"))
+	X, _ := strconv.Atoi(r.FormValue("x"))
+	Y, _ := strconv.Atoi(r.FormValue("y"))
+
+	room := &rooms[roomNumber]
+	room.MakeMove(X, Y)
+	writeJsonResponse(w, Point{X, Y})
+}
+
+//assumes that it's the player hitting this endpoint's turn
+func undoHandler(w http.ResponseWriter, r *http.Request) {
+	roomNumber, _ := strconv.Atoi(r.FormValue("room"))
+
+	room := &rooms[roomNumber]
+	room.MakeMove(-1, -1)
+	writeJsonResponse(w, Point{-1, -1})
+}
 

@@ -1,12 +1,15 @@
 package main
 
-import "errors"
+import (
+	"errors"
+	"github.com/golang-collections/collections/stack"
+)
 
 type Room struct {
 	Summary RoomSummary
 
-	Board [15][15] colour
-	IsBlacksTurn bool
+	MovesHistory stack.Stack
+	IsWhitesTurn bool
 }
 
 func (room Room) IsFull() bool {
@@ -31,6 +34,21 @@ func (room Room) HasBlackPlayerWithName(name string) bool {
 	return name == room.Summary.P1
 }
 
+func (room *Room) MakeMove(X int, Y int) {
+	// move or undo always results in opponent's turn, except if empty board
+	if (room.MovesHistory.Len() > 0) {
+		room.IsWhitesTurn = !room.IsWhitesTurn
+	}
+	if (X == -1 && Y == -1) {
+		//undo
+		room.MovesHistory.Pop()
+	} else {
+		move := &Point{X, Y}
+		room.MovesHistory.Push(move)
+	}
+
+}
+
 
 
 
@@ -47,3 +65,8 @@ const (
 	black
 	white
 )
+
+type Point struct {
+	X int // define (-1, -1) as undo move
+	Y int
+}
