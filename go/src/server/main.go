@@ -27,8 +27,9 @@ var rooms [numRooms]Room
 func main() {
 	http.HandleFunc("/refreshlobby", refreshLobbyHandler)
 	http.HandleFunc("/join", joinHandler)
+	http.HandleFunc("/ismyturn", isMyTurnHandler)
+	//http.HandleFunc("/mostRecentMove", mostRecentMoveHandler)
 	//http.HandleFunc("/spectate", spectateHandler)
-	//http.HandleFunc("/refresh", isMyTurnHandler)
 
 	http.ListenAndServe(":8080", nil)
 	//http.ListenAndServeTLS(":443", "ssl.crt", "ssl.key", nil)
