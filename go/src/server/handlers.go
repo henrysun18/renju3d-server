@@ -77,15 +77,22 @@ func mostRecentMoveHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // usually called ONCE some time after both isMyTurn and mostRecentMove is handled
-// assumes that it's the player hitting this endpoint's turn
 func makeMoveHandler(w http.ResponseWriter, r *http.Request) {
 	roomNumber, _ := strconv.Atoi(r.FormValue("room"))
+	playerNumber, _ := strconv.Atoi(r.FormValue("player-number"))
 	X, _ := strconv.Atoi(r.FormValue("x"))
 	Y, _ := strconv.Atoi(r.FormValue("y"))
 
 	room := &rooms[roomNumber]
-	room.MakeMove(X, Y)
-	writeJsonResponse(w, Point{X, Y})
+	if playerNumber == 2 && room.IsWhitesTurn || playerNumber == 1 && !room.IsWhitesTurn {
+		room.MakeMove(X, Y, playerNumber)
+		writeJsonResponse(w, Point{X, Y})
+	} else {
+		err := "don't try to make a move when it's not your turn!"
+		writeJsonResponse(w, err)
+		errors.New(err)
+	}
+
 }
 
 //assumes that it's the player hitting this endpoint's turn
@@ -93,7 +100,23 @@ func undoHandler(w http.ResponseWriter, r *http.Request) {
 	roomNumber, _ := strconv.Atoi(r.FormValue("room"))
 
 	room := &rooms[roomNumber]
-	room.MakeMove(-1, -1)
+	room.UndoOneMove()
 	writeJsonResponse(w, Point{-1, -1})
+}
+
+//returns board state
+func spectateHandler(w http.ResponseWriter, r *http.Request) {
+	roomNumber, _ := strconv.Atoi(r.FormValue("room"))
+
+	writeJsonResponse(w, rooms[roomNumber].Board)
+}
+
+func exitHandler(w http.ResponseWriter, r *http.Request) {
+	roomNumber, _ := strconv.Atoi(r.FormValue("room"))
+	playerNumber, _ := strconv.Atoi(r.FormValue("player-number"))
+
+	room := &rooms[roomNumber]
+	room.RemovePlayer(playerNumber)
+	writeJsonResponse(w, room.Summary)
 }
 

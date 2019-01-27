@@ -32,8 +32,10 @@ func main() {
 	http.HandleFunc("/most-recent-move", mostRecentMoveHandler)
 	http.HandleFunc("/make-move", makeMoveHandler)
 	http.HandleFunc("/undo", undoHandler)
-	//http.HandleFunc("/spectate", spectateHandler)
 
+	http.HandleFunc("/spectate", spectateHandler)
+
+	http.HandleFunc("/exit", exitHandler)
 	http.ListenAndServe(":8080", nil)
 	//http.ListenAndServeTLS(":443", "ssl.crt", "ssl.key", nil)
 }

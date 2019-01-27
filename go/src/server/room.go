@@ -8,6 +8,7 @@ import (
 type Room struct {
 	Summary RoomSummary
 
+	Board [15][15]colour
 	MovesHistory stack.Stack
 	IsWhitesTurn bool
 }
@@ -34,21 +35,33 @@ func (room Room) HasBlackPlayerWithName(name string) bool {
 	return name == room.Summary.P1
 }
 
-func (room *Room) MakeMove(X int, Y int) {
-	// move or undo always results in opponent's turn, except if empty board
-	if (room.MovesHistory.Len() > 0) {
-		room.IsWhitesTurn = !room.IsWhitesTurn
-	}
+func (room *Room) MakeMove(X int, Y int, playerNumber int) {
 	if (X == -1 && Y == -1) {
-		//undo
-		room.MovesHistory.Pop()
+		room.UndoOneMove()
 	} else {
-		move := &Point{X, Y}
-		room.MovesHistory.Push(move)
-	}
+		room.IsWhitesTurn = !room.IsWhitesTurn
 
+		room.MovesHistory.Push(Point{X, Y})
+		room.Board[X][Y] = colour(playerNumber)
+	}
 }
 
+func (room *Room) UndoOneMove() {
+	if (room.MovesHistory.Len() > 0) {
+		room.IsWhitesTurn = !room.IsWhitesTurn
+		undoneMove := room.MovesHistory.Pop().(Point)
+		room.Board[undoneMove.X][undoneMove.Y] = neither
+	}
+}
+
+func (room *Room) RemovePlayer(playerNumber int) {
+	if playerNumber == 1 {
+		room.Summary.P1 = ""
+	}
+	if playerNumber == 2 {
+		room.Summary.P2 = ""
+	}
+}
 
 
 
