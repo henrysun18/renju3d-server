@@ -69,7 +69,6 @@ func (room *Room) RemovePlayer(playerNumber int) {
 type RoomSummary struct {
 	P1 string //treat P1 as black for now
 	P2 string
-	IsInProgress bool
 }
 
 type colour int
