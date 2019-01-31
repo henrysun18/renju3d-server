@@ -16,6 +16,7 @@ package main
 
 import (
 	"net/http"
+	"time"
 )
 
 //state of the online rooms
@@ -27,6 +28,8 @@ var rooms [numRooms]Room
 func main() {
 	//taking the approach of separating all words with hyphen, everything lower case
 	http.HandleFunc("/refresh-lobby", refreshLobbyHandler)
+	http.HandleFunc("/refresh-room", refreshRoomHandler)
+	http.HandleFunc("/keep-alive", keepAliveHandler)
 	http.HandleFunc("/join", joinHandler)
 	http.HandleFunc("/is-my-turn", isMyTurnHandler)
 	http.HandleFunc("/most-recent-move", mostRecentMoveHandler)
@@ -35,8 +38,31 @@ func main() {
 
 	http.HandleFunc("/spectate", spectateHandler)
 
-	http.HandleFunc("/exit", exitHandler)
+	go evictAbsentPlayersPeriodically()
+
 	http.ListenAndServe(":8080", nil)
 	//http.ListenAndServeTLS(":443", "ssl.crt", "ssl.key", nil)
+
 }
 // [END main]
+
+func evictAbsentPlayersPeriodically() {
+	// keepAlive is called by client every 5s; let's give keepAlive callers a chance to live until now+10s (6s should be fine too)
+	//
+	freshnessDuration := time.Second * 10
+	waitBetweenChecksDuration := time.Second * 5 //arbitrary value less than freshnessDuration
+	ticker := time.NewTicker(waitBetweenChecksDuration)
+	for t := range ticker.C {
+		// check if we got any requests from clients within the last 5 seconds
+		// if not, that means they disconnected
+		for i := range rooms {
+			room := &rooms[i]
+			if t.Sub(room.TimeOfLastRequestFromBlack) > freshnessDuration {
+				room.Summary.P1 = ""
+			}
+			if t.Sub(room.TimeOfLastRequestFromWhite)  > freshnessDuration {
+				room.Summary.P2 = ""
+			}
+		}
+	}
+}

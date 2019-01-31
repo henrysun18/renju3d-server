@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"github.com/golang-collections/collections/stack"
+	"time"
 )
 
 type Room struct {
@@ -11,6 +12,9 @@ type Room struct {
 	Board [15][15]colour
 	MovesHistory stack.Stack
 	IsWhitesTurn bool
+
+	TimeOfLastRequestFromBlack time.Time
+	TimeOfLastRequestFromWhite time.Time
 }
 
 func (room Room) IsFull() bool {

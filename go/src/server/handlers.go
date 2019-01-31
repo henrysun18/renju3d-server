@@ -19,6 +19,7 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 func writeJsonResponse(w http.ResponseWriter, raw interface{}) {
@@ -37,18 +38,41 @@ func refreshLobbyHandler(w http.ResponseWriter, r *http.Request) {
 	writeJsonResponse(w, summaries)
 }
 
+// refresh room state to check for the presence of opponent
+func refreshRoomHandler(w http.ResponseWriter, r *http.Request) {
+	roomNumber, _ := strconv.Atoi(r.FormValue("room"))
+
+	writeJsonResponse(w, rooms[roomNumber].Summary)
+}
+
+// assures the server that client is still online, otherwise a Timer goroutine will handle eviction
+func keepAliveHandler(w http.ResponseWriter, r *http.Request) {
+	roomNumber, _ := strconv.Atoi(r.FormValue("room"))
+	playerNumber, _ := strconv.Atoi(r.FormValue("player-number"))
+
+	room := &rooms[roomNumber]
+	keepAlive(room, playerNumber)
+	// don't write any response to save outbound bandwidth!
+}
+
+func keepAlive(room *Room, playerNumber int) {
+	if (playerNumber == 1) {
+		room.TimeOfLastRequestFromBlack = time.Now()
+	} else if (playerNumber == 2) {
+		room.TimeOfLastRequestFromWhite = time.Now()
+	}
+}
+
 // join a room specifying room# and player name
 func joinHandler(w http.ResponseWriter, r *http.Request) {
 	roomNumber, _ := strconv.Atoi(r.FormValue("room"))
 	name := r.FormValue("name")
-	if name == "" {
-		errors.New("pls don't join with empty name")
-	}
-	room := &rooms[roomNumber] //set room as pointer to our global room so room.AddPlayer mutates it
 
+	room := &rooms[roomNumber]
 	playerNumber := 0
 	if !room.IsFull() {
 		playerNumber = room.AddPlayer(name)
+		keepAlive(room, playerNumber)
 	}
 	writeJsonResponse(w, playerNumber)
 }
@@ -65,6 +89,7 @@ func isMyTurnHandler(w http.ResponseWriter, r *http.Request) {
 	} else if !room.IsWhitesTurn && playerNumber == 1 {
 		isMyTurn = true
 	}
+	//TODO if other player disconnects, u automatically win (also let client handle the frontend for this case)
 	writeJsonResponse(w, isMyTurn)
 }
 
@@ -109,14 +134,5 @@ func spectateHandler(w http.ResponseWriter, r *http.Request) {
 	roomNumber, _ := strconv.Atoi(r.FormValue("room"))
 
 	writeJsonResponse(w, rooms[roomNumber].Board)
-}
-
-func exitHandler(w http.ResponseWriter, r *http.Request) {
-	roomNumber, _ := strconv.Atoi(r.FormValue("room"))
-	playerNumber, _ := strconv.Atoi(r.FormValue("player-number"))
-
-	room := &rooms[roomNumber]
-	room.RemovePlayer(playerNumber)
-	writeJsonResponse(w, room.Summary)
 }
 
