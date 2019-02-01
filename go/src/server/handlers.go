@@ -52,7 +52,14 @@ func keepAliveHandler(w http.ResponseWriter, r *http.Request) {
 
 	room := &rooms[roomNumber]
 	keepAlive(room, playerNumber)
-	// don't write any response to save outbound bandwidth!
+
+	// If one player disconnects, evict both from the room allowing other players to play, then return error
+	if room.Summary.P1 == "" && !time.Time.IsZero(room.TimeOfLastRequestFromBlack) ||
+		room.Summary.P2 == "" && !time.Time.IsZero(room.TimeOfLastRequestFromWhite) {
+		// Means someone recently got evicted
+		writeJsonResponse(w, -1)
+		room.ResetState()
+	}
 }
 
 func keepAlive(room *Room, playerNumber int) {

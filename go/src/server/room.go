@@ -58,13 +58,8 @@ func (room *Room) UndoOneMove() {
 	}
 }
 
-func (room *Room) RemovePlayer(playerNumber int) {
-	if playerNumber == 1 {
-		room.Summary.P1 = ""
-	}
-	if playerNumber == 2 {
-		room.Summary.P2 = ""
-	}
+func (room *Room) ResetState() {
+	room = &Room{}
 }
 
 
