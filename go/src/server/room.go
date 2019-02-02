@@ -59,7 +59,7 @@ func (room *Room) UndoOneMove() {
 }
 
 func (room *Room) ResetState() {
-	room = &Room{}
+	*room = Room{}
 }
 
 

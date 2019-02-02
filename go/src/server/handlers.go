@@ -54,11 +54,9 @@ func keepAliveHandler(w http.ResponseWriter, r *http.Request) {
 	keepAlive(room, playerNumber)
 
 	// If one player disconnects, evict both from the room allowing other players to play, then return error
-	if room.Summary.P1 == "" && !time.Time.IsZero(room.TimeOfLastRequestFromBlack) ||
-		room.Summary.P2 == "" && !time.Time.IsZero(room.TimeOfLastRequestFromWhite) {
-		// Means someone recently got evicted
+	if room.Summary.P1 == "" && room.Summary.P2 == "" {
+		// Room was reset to empty state, means someone recently got evicted
 		writeJsonResponse(w, -1)
-		room.ResetState()
 	}
 }
 

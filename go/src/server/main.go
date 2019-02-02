@@ -57,11 +57,13 @@ func evictAbsentPlayersPeriodically() {
 		// if not, that means they disconnected
 		for i := range rooms {
 			room := &rooms[i]
-			if t.Sub(room.TimeOfLastRequestFromBlack) > freshnessDuration {
-				room.Summary.P1 = ""
-			}
-			if t.Sub(room.TimeOfLastRequestFromWhite)  > freshnessDuration {
-				room.Summary.P2 = ""
+			p1ShouldBeInRoom := !time.Time.IsZero(room.TimeOfLastRequestFromBlack)
+			p2ShouldBeInRoom := !time.Time.IsZero(room.TimeOfLastRequestFromWhite)
+			p1CannotBeFound := t.Sub(room.TimeOfLastRequestFromBlack) > freshnessDuration
+			p2CannotBeFound := t.Sub(room.TimeOfLastRequestFromWhite)  > freshnessDuration
+			if p1ShouldBeInRoom && p1CannotBeFound ||
+				p2ShouldBeInRoom && p2CannotBeFound {
+				room.ResetState()
 			}
 		}
 	}
