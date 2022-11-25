@@ -15,6 +15,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -26,6 +27,7 @@ var rooms [numRooms]Room
 
 // [START main]
 func main() {
+	fmt.Println("starting server...");
 	//taking the approach of separating all words with hyphen, everything lower case
 	http.HandleFunc("/refresh-lobby", refreshLobbyHandler)
 	http.HandleFunc("/refresh-room", refreshRoomHandler)
@@ -38,9 +40,15 @@ func main() {
 
 	http.HandleFunc("/spectate", spectateHandler)
 
-	go evictAbsentPlayersPeriodically()
-
+	if (false) {
+		fmt.Println("starting goroutine to evict empty rooms");
+		go evictAbsentPlayersPeriodically()
+	} else {
+		fmt.Println("disabling room eviction logic for debugging");
+	}
+	fmt.Println("started server...");
 	http.ListenAndServe(":8080", nil)
+
 	//http.ListenAndServeTLS(":443", "ssl.crt", "ssl.key", nil)
 
 }
@@ -64,6 +72,7 @@ func evictAbsentPlayersPeriodically() {
 			if p1ShouldBeInRoom && p1CannotBeFound ||
 				p2ShouldBeInRoom && p2CannotBeFound {
 				room.ResetState()
+				fmt.Println("resetting room ", i, " since p1 and/or p2 are not here");
 			}
 		}
 	}

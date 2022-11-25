@@ -17,6 +17,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -72,7 +73,7 @@ func keepAlive(room *Room, playerNumber int) {
 func joinHandler(w http.ResponseWriter, r *http.Request) {
 	roomNumber, _ := strconv.Atoi(r.FormValue("room"))
 	name := r.FormValue("name")
-
+fmt.Println("joinHandler", roomNumber, name);
 	room := &rooms[roomNumber]
 	playerNumber := 0
 	if !room.IsFull() {
