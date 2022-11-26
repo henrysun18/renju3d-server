@@ -20,14 +20,14 @@ import (
 	"time"
 )
 
-//state of the online rooms
+// state of the online rooms
 const numRooms = 10
-var rooms [numRooms]Room
 
+var rooms [numRooms]Room
 
 // [START main]
 func main() {
-	fmt.Println("starting server...");
+	fmt.Println("starting server...")
 	//taking the approach of separating all words with hyphen, everything lower case
 	http.HandleFunc("/refresh-lobby", refreshLobbyHandler)
 	http.HandleFunc("/refresh-room", refreshRoomHandler)
@@ -36,22 +36,22 @@ func main() {
 	http.HandleFunc("/is-my-turn", isMyTurnHandler)
 	http.HandleFunc("/most-recent-move", mostRecentMoveHandler)
 	http.HandleFunc("/make-move", makeMoveHandler)
-	http.HandleFunc("/undo", undoHandler)
 
 	http.HandleFunc("/spectate", spectateHandler)
 
-	if (false) {
-		fmt.Println("starting goroutine to evict empty rooms");
+	if true {
+		fmt.Println("starting goroutine to evict empty rooms")
 		go evictAbsentPlayersPeriodically()
 	} else {
-		fmt.Println("disabling room eviction logic for debugging");
+		fmt.Println("disabling room eviction logic for debugging")
 	}
-	fmt.Println("started server...");
+	fmt.Println("started server...")
 	http.ListenAndServe(":8080", nil)
 
 	//http.ListenAndServeTLS(":443", "ssl.crt", "ssl.key", nil)
 
 }
+
 // [END main]
 
 func evictAbsentPlayersPeriodically() {
@@ -68,11 +68,11 @@ func evictAbsentPlayersPeriodically() {
 			p1ShouldBeInRoom := !time.Time.IsZero(room.TimeOfLastRequestFromBlack)
 			p2ShouldBeInRoom := !time.Time.IsZero(room.TimeOfLastRequestFromWhite)
 			p1CannotBeFound := t.Sub(room.TimeOfLastRequestFromBlack) > freshnessDuration
-			p2CannotBeFound := t.Sub(room.TimeOfLastRequestFromWhite)  > freshnessDuration
+			p2CannotBeFound := t.Sub(room.TimeOfLastRequestFromWhite) > freshnessDuration
 			if p1ShouldBeInRoom && p1CannotBeFound ||
 				p2ShouldBeInRoom && p2CannotBeFound {
 				room.ResetState()
-				fmt.Println("resetting room ", i, " since p1 and/or p2 are not here");
+				fmt.Println("resetting room ", i, " since p1 and/or p2 are not here")
 			}
 		}
 	}

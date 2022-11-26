@@ -17,7 +17,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -25,6 +24,7 @@ import (
 
 func writeJsonResponse(w http.ResponseWriter, raw interface{}) {
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	response, _ := json.Marshal(raw)
 	w.Write([]byte(response))
 }
@@ -54,17 +54,20 @@ func keepAliveHandler(w http.ResponseWriter, r *http.Request) {
 	room := &rooms[roomNumber]
 	keepAlive(room, playerNumber)
 
-	// If one player disconnects, evict both from the room allowing other players to play, then return error
+	// If one player disconnects, return "error" notifying the remaining player they won
 	if room.Summary.P1 == "" && room.Summary.P2 == "" {
 		// Room was reset to empty state, means someone recently got evicted
 		writeJsonResponse(w, -1)
+	} else {
+		// keepAlive was acked
+		writeJsonResponse(w, 1)
 	}
 }
 
 func keepAlive(room *Room, playerNumber int) {
-	if (playerNumber == 1) {
+	if playerNumber == 1 {
 		room.TimeOfLastRequestFromBlack = time.Now()
-	} else if (playerNumber == 2) {
+	} else if playerNumber == 2 {
 		room.TimeOfLastRequestFromWhite = time.Now()
 	}
 }
@@ -73,7 +76,7 @@ func keepAlive(room *Room, playerNumber int) {
 func joinHandler(w http.ResponseWriter, r *http.Request) {
 	roomNumber, _ := strconv.Atoi(r.FormValue("room"))
 	name := r.FormValue("name")
-fmt.Println("joinHandler", roomNumber, name);
+	//fmt.Println("joinHandler", roomNumber, name)
 	room := &rooms[roomNumber]
 	playerNumber := 0
 	if !room.IsFull() {
@@ -116,6 +119,7 @@ func makeMoveHandler(w http.ResponseWriter, r *http.Request) {
 
 	room := &rooms[roomNumber]
 	if playerNumber == 2 && room.IsWhitesTurn || playerNumber == 1 && !room.IsWhitesTurn {
+		//fmt.Println("player %d making move %d,%d in room %d", playerNumber, X, Y, roomNumber)
 		room.MakeMove(X, Y, playerNumber)
 		writeJsonResponse(w, Point{X, Y})
 	} else {
@@ -126,19 +130,9 @@ func makeMoveHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-//assumes that it's the player hitting this endpoint's turn
-func undoHandler(w http.ResponseWriter, r *http.Request) {
-	roomNumber, _ := strconv.Atoi(r.FormValue("room"))
-
-	room := &rooms[roomNumber]
-	room.UndoOneMove()
-	writeJsonResponse(w, Point{-1, -1})
-}
-
-//returns board state
+// returns board state
 func spectateHandler(w http.ResponseWriter, r *http.Request) {
 	roomNumber, _ := strconv.Atoi(r.FormValue("room"))
 
 	writeJsonResponse(w, rooms[roomNumber].Board)
 }
-

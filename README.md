@@ -11,3 +11,5 @@ Old method of networking [Renju3D v1.2 Online](http://henrysun.me/unity/Renju3D_
 New method of networking:
 
 ![alt text](https://github.com/henrysun18/renju3d-server/blob/master/compute-engine-approach.png?raw=true)
+
+To enable REST API calls: go to Google Cloud Console and add TCP 8080 to the firewall allowlist for the 0.0.0.0/0 IP range (all IPv4 IP addresses)
