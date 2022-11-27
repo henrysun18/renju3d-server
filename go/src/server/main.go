@@ -39,7 +39,7 @@ func main() {
 
 	http.HandleFunc("/spectate", spectateHandler)
 
-	if true {
+	if false {
 		fmt.Println("starting goroutine to evict empty rooms")
 		go evictAbsentPlayersPeriodically()
 	} else {
@@ -120,9 +120,9 @@ func main() {
 // [END main]
 
 func evictAbsentPlayersPeriodically() {
-	// keepAlive is called by client every 5s; let's give keepAlive callers a chance to live until now+10s (6s should be fine too)
+	// keepAlive is called by client every 1s; let's give keepAlive callers a chance to live until we're sure they've quit
 	//
-	freshnessDuration := time.Second * 10
+	freshnessDuration := time.Second * 20
 	waitBetweenChecksDuration := time.Second * 5 //arbitrary value less than freshnessDuration
 	ticker := time.NewTicker(waitBetweenChecksDuration)
 	for t := range ticker.C {

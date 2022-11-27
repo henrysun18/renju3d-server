@@ -1,3 +1,4 @@
+
 # renju3d-server
 Server-side code to facilitate client-server networking in my Unity game (Renju3D)
 
@@ -13,3 +14,12 @@ New method of networking:
 ![alt text](https://github.com/henrysun18/renju3d-server/blob/master/compute-engine-approach.png?raw=true)
 
 To enable REST API calls: go to Google Cloud Console and add TCP 8080 to the firewall allowlist for the 0.0.0.0/0 IP range (all IPv4 IP addresses)
+
+## Setup
+1. Check out the source code inside a Google Compute Engine VM instance, via SSH. 
+2. In Google Cloud Console, ensure Firewall for this VM is configured to allow Ingress into port TCP:8443 (e.g. 3 dots menu in VM instances page --> View network details --> Firewall burger menu tab --> Create Firewall rule)
+3. Inside the remote terminal, enter `cd ~/renju3d-server/go/src/server && go build && sudo go run .` If you see something like `sudo: go: command not found`, then follow [these steps](https://stackoverflow.com/a/71910152). Note that sudo privileges are needed here for TLS related reasons, otherwise clients would fail to connect.
+4. Background the server process by following these [steps](https://stackoverflow.com/a/954415): 
+>`ctrl-z`
+>`disown -h %1 && bg 1`
+>`logout` (or `exit`)
