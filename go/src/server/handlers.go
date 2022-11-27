@@ -120,7 +120,11 @@ func makeMoveHandler(w http.ResponseWriter, r *http.Request) {
 	Y, _ := strconv.Atoi(r.FormValue("y"))
 
 	room := &rooms[roomNumber]
-	if playerNumber == 2 && room.IsWhitesTurn || playerNumber == 1 && !room.IsWhitesTurn {
+	if X == -100 {
+		// vacate the room and let the other player know early on, once a user sends the signal that they left the room
+		room.ResetState()
+		writeJsonResponse(w, Point{X, Y})
+	} else if playerNumber == 2 && room.IsWhitesTurn || playerNumber == 1 && !room.IsWhitesTurn {
 		//fmt.Println("player %d making move %d,%d in room %d", playerNumber, X, Y, roomNumber)
 		room.MakeMove(X, Y, playerNumber)
 		writeJsonResponse(w, Point{X, Y})
