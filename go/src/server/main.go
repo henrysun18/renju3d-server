@@ -47,8 +47,18 @@ func main() {
 	}
 	//fmt.Println("started server...")
 
+	/////////// ZeroSSL Domain Verification
+	//handler := http.FileServer(http.Dir("."))
+	// ex1 := http.ListenAndServe(":80", handler)
+	// if ex1 != nil {
+	// 	fmt.Println("failed to start fileserver: ", ex1)
+	// }
+	//http.HandleFunc("/.well-known/pki-validation/", domainVerificationHandler)
+	//return
+
 	//http.ListenAndServe(":8080", nil)
-	ex := http.ListenAndServeTLS(":8443", "server.crt", "server.key", nil)
+	//ex := http.ListenAndServeTLS(":8443", "server.crt", "server.key", nil)
+	ex := http.ListenAndServeTLS(":8443", "zerossl_certs/certificate.crt", "zerossl_certs/private.key", nil)
 	if ex != nil {
 		fmt.Println("HTTPS failed to start due to ", ex)
 	}
