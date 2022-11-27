@@ -25,6 +25,8 @@ import (
 func writeJsonResponse(w http.ResponseWriter, raw interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+	w.Header().Set("Access-Control-Allow-Methods", "OPTIONS,POST,GET")
 	response, _ := json.Marshal(raw)
 	w.Write([]byte(response))
 }

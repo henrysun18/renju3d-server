@@ -45,12 +45,67 @@ func main() {
 	} else {
 		fmt.Println("disabling room eviction logic for debugging")
 	}
-	fmt.Println("started server...")
-	http.ListenAndServe(":8080", nil)
+	//fmt.Println("started server...")
 
-	//http.ListenAndServeTLS(":443", "ssl.crt", "ssl.key", nil)
+	//http.ListenAndServe(":8080", nil)
+	ex := http.ListenAndServeTLS(":8443", "server.crt", "server.key", nil)
+	if ex != nil {
+		fmt.Println("HTTPS failed to start due to ", ex)
+	}
+	return
+
+	// copypaste from https://github.com/kjk/go-cookbook/blob/master/free-ssl-certificates/main.go
+	// var httpsSrv *http.Server
+	// var m *autocert.Manager
+	// hostPolicy := func(ctx context.Context, host string) error {
+	// 	// Note: change to your real domain
+	// 	allowedHost := "35.233.155.184"
+	// 	if host == allowedHost {
+	// 		return nil
+	// 	}
+	// 	return fmt.Errorf("acme/autocert: only %s host is allowed", allowedHost)
+	// }
+	// fmt.Println("done hostpolicy")
+	// dataDir := "."
+	// m = &autocert.Manager{
+	// 	Prompt:     autocert.AcceptTOS,
+	// 	HostPolicy: hostPolicy,
+	// 	Cache:      autocert.DirCache(dataDir),
+	// }
+
+	// fmt.Println("done autocert manager")
+	// httpsSrv = makeHTTPServer()
+	// httpsSrv.Addr = ":443"
+	// httpsSrv.TLSConfig = &tls.Config{GetCertificate: m.GetCertificate}
+
+	// //go func() {
+	// fmt.Printf("Starting HTTPS server on %s\n", httpsSrv.Addr)
+	// err := httpsSrv.ListenAndServeTLS("", "")
+	// if err != nil {
+	// 	log.Fatalf("httpsSrv.ListendAndServeTLS() failed with %s", err)
+	// }
+	// //}()
 
 }
+
+// // https://blog.kowalczyk.info/article/Jl3G/https-for-free-in-go-with-little-help-of-lets-encrypt.html
+// func handleIndex(w http.ResponseWriter, r *http.Request) {
+// 	var htmlIndex = `<html><body>Welcome!</body></html>`
+// 	io.WriteString(w, htmlIndex)
+// }
+// func makeHTTPServer() *http.Server {
+// 	mux := &http.ServeMux{}
+// 	mux.HandleFunc("/", handleIndex) //handleIndex)
+
+// 	// set timeouts so that a slow or malicious client doesn't
+// 	// hold resources forever
+// 	return &http.Server{
+// 		ReadTimeout:  5 * time.Second,
+// 		WriteTimeout: 5 * time.Second,
+// 		IdleTimeout:  120 * time.Second,
+// 		Handler:      mux,
+// 	}
+// }
 
 // [END main]
 
