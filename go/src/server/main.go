@@ -39,7 +39,7 @@ func main() {
 
 	http.HandleFunc("/spectate", spectateHandler)
 
-	if false {
+	if true {
 		fmt.Println("starting goroutine to evict empty rooms")
 		go evictAbsentPlayersPeriodically()
 	} else {
