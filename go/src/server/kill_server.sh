@@ -9,5 +9,10 @@ else
   echo "Shutting down Renju3D Server with PID $PID_OF_TLS_SERVER"
   sudo kill -9 ${PID_OF_TLS_SERVER}
 fi
+
+echo "Removing log file (server_log.out)"
+cd ~/renju3d-server/go/src/server
+rm server_log.out
+
 # exit out of the script
 exit 1

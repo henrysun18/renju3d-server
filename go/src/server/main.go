@@ -15,6 +15,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"net/http"
 	"time"
@@ -48,21 +49,31 @@ func main() {
 	//fmt.Println("started server...")
 
 	/////////// ZeroSSL Domain Verification
-	//handler := http.FileServer(http.Dir("."))
-	// ex1 := http.ListenAndServe(":80", handler)
-	// if ex1 != nil {
-	// 	fmt.Println("failed to start fileserver: ", ex1)
-	// }
-	//http.HandleFunc("/.well-known/pki-validation/", domainVerificationHandler)
-	//return
+	// https://www.golinuxcloud.com/golang-command-line-arguments/
+	var isZeroSSLDomainVerificationRun bool
+	flag.BoolVar(&isZeroSSLDomainVerificationRun, "renew_ssl", false, "Enter true if this server instance will be started strictly for ZeroSSL Domain Verification via HTTP File Upload")
+	flag.Parse()
+	fmt.Println("renew_ssl value:", isZeroSSLDomainVerificationRun)
+	if isZeroSSLDomainVerificationRun {
+		// start file hosting server to help verify domain
+		handler := http.FileServer(http.Dir("."))
+		ex1 := http.ListenAndServe(":80", handler)
+		if ex1 != nil {
+			fmt.Println("failed to start fileserver: ", ex1)
+		}
+		// http.HandleFunc("/.well-known/pki-validation/", domainVerificationHandler)
+		return
 
-	//http.ListenAndServe(":8080", nil)
-	//ex := http.ListenAndServeTLS(":8443", "server.crt", "server.key", nil)
-	ex := http.ListenAndServeTLS(":8443", "zerossl_certs/certificate.crt", "zerossl_certs/private.key", nil)
-	if ex != nil {
-		fmt.Println("HTTPS failed to start due to ", ex)
+		// http.ListenAndServe(":8080", nil)
+		// ex := http.ListenAndServeTLS(":8443", "server.crt", "server.key", nil)
+	} else {
+		// start the renju3d-server normally, using the issued ZeroSSL certs
+		ex := http.ListenAndServeTLS(":8443", "zerossl_certs/certificate.crt", "zerossl_certs/private.key", nil)
+		if ex != nil {
+			fmt.Println("HTTPS failed to start due to ", ex)
+		}
+		return
 	}
-	return
 
 	// copypaste from https://github.com/kjk/go-cookbook/blob/master/free-ssl-certificates/main.go
 	// var httpsSrv *http.Server
