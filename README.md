@@ -25,8 +25,8 @@ To enable REST API calls: go to Google Cloud Console and add TCP 8080 to the fir
 ZeroSSL offers free 90-day certificates to enable HTTPS traffic so that Unity WebGL games can actually have permission to communicate with the Go server. This requires manually renewing every 3 months though, but is easy with the following steps:
 1. Click the Renew Certificate button in the "Certificate Expiring in 14 Days" reminder email. Alternatively, go directly to this link: https://app.zerossl.com/certificates
 2. Click Renew, and choose HTTP File Upload.
-3. Download the txt file and upload to ~/renju3d-server/go/src/server/.well-known/pki-validation (can do this by dropping the file directly there via MobaXTerm, or by simply creating a new txt file and copy-pasting the contents).
+3. Download the txt file and upload to `~/renju3d-server/go/src/server/.well-known/pki-validation` (can do this by dropping the file directly there via MobaXTerm, or by simply creating a new txt file and copy-pasting the contents).
 4. `cd ~/renju3d-server/go/src/server && bash restart_with_domain_verification.sh`
-5. When the script prompts you to Verify Domain, go back to the browser and click the Verify Domain button.
+5. Follow the prompts to Verify Domain, download the renewed certificates, and copy them to the server.
 6. Back in the terminal, press any button to proceed, and the script will restart the server.
 7. Feel free to close the terminal, as the server has been backgrounded and will continue running.
