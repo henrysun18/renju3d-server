@@ -30,3 +30,5 @@ ZeroSSL offers free 90-day certificates to enable HTTPS traffic so that Unity We
 5. Follow the prompts to Verify Domain, download the renewed certificates, and copy them to the server.
 6. Back in the terminal, press any button to proceed, and the script will restart the server.
 7. Feel free to close the terminal, as the server has been backgrounded and will continue running.
+8. Revoke the expired certificate at https://app.zerossl.com/certificates/expiring_soon to avoid reminder emails at the 7-day mark and beyond.
+9. Come back next time, in 2.5 months!
